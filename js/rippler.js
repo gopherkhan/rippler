@@ -12,6 +12,26 @@ class Rippler {
 		this.clickSrc = [null];
 		this.subInterval = 45;
 		this.lastRotation = {};
+		this.COLORS  = ['#1f77b4',
+						'#aec7e8',
+						'#ff7f0e',
+						'#ffbb78',
+						'#2ca02c',
+						'#98df8a',
+						'#d62728',
+						'#ff9896',
+						'#9467bd',
+						'#c5b0d5',
+						'#8c564b',
+						'#c49c94',
+						'#e377c2',
+						'#f7b6d2',
+						'#7f7f7f',
+						'#c7c7c7',
+						'#bcbd22',
+						'#dbdb8d',
+						'#17becf',
+						'#9edae5'];
 	}
 
 	init(domElem) {
@@ -111,7 +131,7 @@ class Rippler {
 			}, this);
 	}
 
-	bumpXRotation(coords) {
+	bumpYRotation(coords) {
 		let key = coords.x + "," + coords.y;
 		this.lastRotation[key] = this.lastRotation[key] || 0;
 		this.lastRotation[key] = this.lastRotation[key] + this.subInterval;
@@ -119,9 +139,9 @@ class Rippler {
 	}
 
 	startRipple(coords, count) {
-		let xRotation = this.bumpXRotation(coords);  
+		let xRotation = this.bumpYRotation(coords);  
 		let zRotation = this.calcZRotation(coords, count);
-		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateX(' + xRotation  + 'deg)';
+		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + xRotation  + 'deg)';
 		let node = this.circles[coords.y][coords.x];
 		node.style.transform = node.style['-webkit-transform'] = transform;
 	}
@@ -131,10 +151,10 @@ class Rippler {
 		let deltaY = coords.y - src.y;
 		let deltaX = coords.x - src.x;
 		let diameter = this.rad * 2;
-		return Math.atan2(deltaY * diameter, deltaX * diameter) * 180 / Math.PI + 90; 
+		return Math.atan2(deltaY * diameter, deltaX * diameter) * 180 / Math.PI; 
 	}
 
-	getLastXRotation(coords) {
+	getLastYRotation(coords) {
 		let key = coords.x + "," + coords.y;
 		return this.lastRotation[key];
 	}
@@ -143,16 +163,21 @@ class Rippler {
 		let node = e.target;
 		let coords = this.getCoordinates(node);
 		let count = this.toggles[coords.y][coords.x];
-		if (this.getLastXRotation(coords) % 360 == 0) {
+		let lastRotation = this.getLastYRotation(coords)
+		if (lastRotation % 360 == 0) {
 			return;
 		}
 
+		let colorIdx = Math.floor((lastRotation - 90) / 180) % this.COLORS.length;
+		let color = this.COLORS[colorIdx];
+		
 		this.rippleOut(node);
 
 		let zRotation = this.calcZRotation(coords, count);
-		let xRotation = this.bumpXRotation(coords);
-		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateX(' + xRotation  + 'deg)';
+		let yRotation = this.bumpYRotation(coords);
+		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
 		node.style.transform = node.style['-webkit-transform'] = transform;
+		node.style['background-color'] = color;
 	}
 
 	makeCircle(row, col) {

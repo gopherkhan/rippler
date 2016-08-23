@@ -12,16 +12,16 @@ html, body {
 }
 
 .circle {
-	border-radius: 50%;
+	border-radius: 6px; /*50%; */
 	width: 30px;
 	height: 30px;
 	position: absolute;
 	border: 2px solid white;
-	background-color: teal;
+	background-color: #1f77b4;/*teal; */
 	transition: all;
 	transition-duration: 50ms;
-	transform: translate3d(0,0,0) rotate(0deg) rotateX(0deg);
-	-webkit-transform: translate3d(0,0,0) rotate(0deg) rotateX(0deg);
+	transform: translate3d(0,0,0) rotate(0deg) rotateY(0deg);
+	-webkit-transform: translate3d(0,0,0) rotate(0deg) rotateY(0deg);
 }
 
 circle {
