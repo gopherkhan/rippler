@@ -84,8 +84,10 @@ class Rippler {
 	}
 
 	handleClick(e) {
+		e.preventDefault();
+		e.stopPropagation();
 		let node = e.target;
-		if (!node.classList.contains('circle')) {
+		if (!node.classList.contains('card')) {
 			return;
 		}
 		let coords = this.getCoordinates(node);
@@ -160,6 +162,8 @@ class Rippler {
 	}
 
 	transitionHandler(e) {
+		e.preventDefault();
+		e.stopPropagation();
 		let node = e.target;
 		let coords = this.getCoordinates(node);
 		let count = this.toggles[coords.y][coords.x];
@@ -181,7 +185,7 @@ class Rippler {
 	}
 
 	makeCircle(row, col) {
-		let circle = this.createDomElement('div', ['circle']);//this.createSVGElement('circle');
+		let circle = this.createDomElement('div', ['card']);//this.createSVGElement('circle');
 		circle.setAttribute('data-x', col);
 		circle.setAttribute('data-y', row);
 		let diameter = this.rad * 2;
