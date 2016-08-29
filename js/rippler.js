@@ -1,118 +1,111 @@
-class Rippler {
+window.Rippler = function Rippler () {
+	var domElem = null;
+	var width = 0;
+	var height = 0;
+	var svg = null;
+	var rad = 16;
+	var toggles = null;
+	var clickCount = 0;
+	var clickSrc = [null];
+	var subInterval = 45;
+	var lastRotation = {};
+	var COLORS  = ['#1f77b4',
+					'#aec7e8',
+					'#ff7f0e',
+					'#ffbb78',
+					'#2ca02c',
+					'#98df8a',
+					'#d62728',
+					'#ff9896',
+					'#9467bd',
+					'#c5b0d5',
+					'#8c564b',
+					'#c49c94',
+					'#e377c2',
+					'#f7b6d2',
+					'#7f7f7f',
+					'#c7c7c7',
+					'#bcbd22',
+					'#dbdb8d',
+					'#17becf',
+					'#9edae5'];
 
-	constructor() {
-		this.XMLNS = "http://www.w3.org/2000/svg";
-		this.domElem = null;
-		this.width = 0;
-		this.height = 0;
-		this.svg = null;
-		this.rad = 16;
-		this.toggles = null;
-		this.clickCount = 0;
-		this.clickSrc = [null];
-		this.subInterval = 45;
-		this.lastRotation = {};
-		this.COLORS  = ['#1f77b4',
-						'#aec7e8',
-						'#ff7f0e',
-						'#ffbb78',
-						'#2ca02c',
-						'#98df8a',
-						'#d62728',
-						'#ff9896',
-						'#9467bd',
-						'#c5b0d5',
-						'#8c564b',
-						'#c49c94',
-						'#e377c2',
-						'#f7b6d2',
-						'#7f7f7f',
-						'#c7c7c7',
-						'#bcbd22',
-						'#dbdb8d',
-						'#17becf',
-						'#9edae5'];
-	}
+	function init(target) {
 
-	init(domElem) {
-
-		if (typeof domElem === "string") {
-			domElem = document.querySelector(domElem);
-			if (!domElem) { return; }
+		if (typeof target === "string") {
+			target = document.querySelector(target);
+			if (!target) { return; }
 		}
-		this.domElem = domElem;
-		let boundingRect = domElem.getBoundingClientRect();
-		this.width = boundingRect.width;
-		this.height = boundingRect.height;
+		domElem = target;
+		var boundingRect = domElem.getBoundingClientRect();
+		width = boundingRect.width;
+		height = boundingRect.height;
 
-		// this.svg = this.createSVGElement('svg');
-		// this.setSVGAttribute(this.svg, 'width', this.width + 'px');
-		// this.setSVGAttribute(this.svg, 'height', this.height + 'px');
-		// domElem.appendChild(this.svg);
+		
+		_initCircles();
 
-		this.initCircles();
-
-		domElem.addEventListener('click', this.handleClick.bind(this), true);
-		domElem.addEventListener('transitionend', this.transitionHandler.bind(this), true);
+		domElem.addEventListener('click', _handleClick, true);
+		domElem.addEventListener('transitionend', _transitionHandler, true);
 	}
 
-	initCircles() {
-		var diameter = 2 * this.rad;
-		var numWide = Math.floor(this.width / diameter);
-		var numTall = Math.floor(this.height / diameter);
+	function _initCircles() {
+		var diameter = 2 * rad;
+		var numWide = Math.floor(width / diameter);
+		var numTall = Math.floor(height / diameter);
 		var frag = document.createDocumentFragment();
+		var circle;
 
-		this.toggles = new Array(numTall);
-		this.circles = new Array(numTall);
+		toggles = new Array(numTall);
+		circles = new Array(numTall);
 		for (var i = 0; i < numTall; ++i) {
-			this.circles[i] = new Array(numWide);
-			this.toggles[i] = new Array(numWide);
+			circles[i] = new Array(numWide);
+			toggles[i] = new Array(numWide);
 			for (var j = 0; j < numWide; ++j) {
-				let circle = this.circles[i][j] = this.makeCircle(i, j);
+				circle = circles[i][j] = _makeCircle(i, j);
 				frag.appendChild(circle);
 			}
 		}
 
-		this.domElem.appendChild(frag);
+		domElem.appendChild(frag);
 	}
 
-	getCoordinates(node) {
+	function _getCoordinates(node) {
 		return {
 			x: ~~node.getAttribute('data-x'),
 			y: ~~node.getAttribute('data-y')
 		};
 	}
 
-	handleClick(e) {
+	function _handleClick(e) {
 		e.preventDefault();
 		e.stopPropagation();
-		let node = e.target;
+		var node = e.target;
 		if (!node.classList.contains('card')) {
 			return;
 		}
-		let coords = this.getCoordinates(node);
-		this.clickCount++;
-		this.clickSrc.push(coords);
-		this.toggles[coords.y][coords.x] = this.clickCount;
-		this.startRipple(coords, this.clickCount);
+		var coords = _getCoordinates(node);
+		clickCount++;
+		clickSrc.push(coords);
+		toggles[coords.y][coords.x] = clickCount;
+		_startRipple(coords, clickCount);
 	}
 
-	collectNeighbors(x, y) {
-		let count = this.toggles[y][x];
-		let neighbors = [];
-		for (let i = -1; i <= 1; ++i) {
-			let nextY = y + i;
-			if (nextY < 0 || nextY >= this.circles.length) { 
+	function _collectNeighbors(x, y) {
+		var count = toggles[y][x];
+		var neighbors = [], nextY, nextX, neighborCount;
+		for (var i = -1; i <= 1; ++i) {
+			nextY = y + i;
+			if (nextY < 0 || nextY >= circles.length) { 
 				continue; 
 			}
-			for (let j = -1; j <= 1; ++j) {
-				let nextX = j + x;
-				if (j == 0 && i == 0|| nextX < 0 || nextX >= this.circles[nextY].length) {
+			for (var j = -1; j <= 1; ++j) {
+				nextX = j + x;
+				if (j == 0 && i == 0|| nextX < 0 || nextX >= circles[nextY].length) {
 					continue;
 				}
-				let neighborCount = this.toggles[nextY][nextX];
+				neighborCount = toggles[nextY][nextX];
 				if (!neighborCount || neighborCount < count) {
-					this.toggles[nextY][nextX] = count;
+					toggles[nextY][nextX] = count;
 					neighbors.push({
 						y: nextY,
 						x: nextX
@@ -123,105 +116,90 @@ class Rippler {
 		return neighbors;
 	}
 
-	rippleOut(node) {
-		let coords = this.getCoordinates(node);
-		let count = this.toggles[coords.y][coords.x];
-		let neighbors = this.collectNeighbors(coords.x, coords.y);
+	function _rippleOut(node) {
+		var coords = _getCoordinates(node);
+		var count = toggles[coords.y][coords.x];
+		var neighbors = _collectNeighbors(coords.x, coords.y);
 		neighbors.forEach(
 			function(neighbor) {
-				this.startRipple(neighbor, count);
-			}, this);
+				_startRipple(neighbor, count);
+			});
 	}
 
-	bumpYRotation(coords) {
-		let key = coords.x + "," + coords.y;
-		this.lastRotation[key] = this.lastRotation[key] || 0;
-		this.lastRotation[key] = this.lastRotation[key] + this.subInterval;
-		return this.lastRotation[key];
+	function _makeKey(coords) {
+		return coords.x + "," + coords.y;
 	}
 
-	startRipple(coords, count) {
-		let xRotation = this.bumpYRotation(coords);  
-		let zRotation = this.calcZRotation(coords, count);
-		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + xRotation  + 'deg)';
-		let node = this.circles[coords.y][coords.x];
-		node.style.transform = node.style['-webkit-transform'] = transform;
+	function _bumpYRotation(coords) {
+		var key = _makeKey(coords);
+		lastRotation[key] = lastRotation[key] || 0;
+		lastRotation[key] = lastRotation[key] + subInterval;
+		return lastRotation[key];
 	}
 
-	calcZRotation(coords, count) {
-		let src = this.clickSrc[count];
-		let deltaY = coords.y - src.y;
-		let deltaX = coords.x - src.x;
-		let diameter = this.rad * 2;
+	function _startRipple(coords, count) {
+		var node = circles[coords.y][coords.x];
+		_updateTransform(node, coords, count);
+	}
+
+	function _calcZRotation(coords, count) {
+		var src = clickSrc[count];
+		var deltaY = coords.y - src.y;
+		var deltaX = coords.x - src.x;
+		var diameter = rad * 2;
 		return Math.atan2(deltaY * diameter, deltaX * diameter) * 180 / Math.PI; 
 	}
 
-	getLastYRotation(coords) {
-		let key = coords.x + "," + coords.y;
-		return this.lastRotation[key];
+	function _getLastYRotation(coords) {
+		return lastRotation[_makeKey(coords)];
 	}
 
-	transitionHandler(e) {
+	function _transitionHandler(e) {
 		e.preventDefault();
 		e.stopPropagation();
-		let node = e.target;
-		let coords = this.getCoordinates(node);
-		let count = this.toggles[coords.y][coords.x];
-		let lastRotation = this.getLastYRotation(coords)
+		var node = e.target;
+		var coords = _getCoordinates(node);
+		var count = toggles[coords.y][coords.x];
+		var lastRotation = _getLastYRotation(coords)
 		if (lastRotation % 360 == 0) {
 			return;
 		}
 
-		let colorIdx = Math.floor((lastRotation - 90) / 180) % this.COLORS.length;
-		let color = this.COLORS[colorIdx];
+		var colorIdx = Math.floor((lastRotation - 90) / 180) % COLORS.length;
+		var color = COLORS[colorIdx];
 		
-		this.rippleOut(node);
+		_rippleOut(node);
 
-		let zRotation = this.calcZRotation(coords, count);
-		let yRotation = this.bumpYRotation(coords);
-		let transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
-		node.style.transform = node.style['-webkit-transform'] = transform;
+		_updateTransform(node, coords, count);
 		node.style['background-color'] = color;
 	}
 
-	makeCircle(row, col) {
-		let circle = this.createDomElement('div', ['card']);//this.createSVGElement('circle');
+	function _updateTransform(node, coords, count) {
+		var zRotation = _calcZRotation(coords, count);
+		var yRotation = _bumpYRotation(coords);
+		var transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
+		node.style.transform = node.style['-webkit-transform'] = transform;
+	}
+
+	function _makeCircle(row, col) {
+		var circle = _createDomElement('div', ['card']);
 		circle.setAttribute('data-x', col);
 		circle.setAttribute('data-y', row);
-		let diameter = this.rad * 2;
+		var diameter = rad * 2;
 		circle.style.left = (diameter * col) + 'px';
-		circle.style.top = (diameter * row) + 'px'; 
-		// this.setSVGAttribute(circle, 'r', this.rad);
-		// this.setSVGAttribute(circle, 'cx', diameter * col + this.rad);
-		// this.setSVGAttribute(circle, 'cy', diameter * row + this.rad);
+		circle.style.top = (diameter * row) + 'px';
 		return circle;
 	}
 
-	// translateNode(node) {
-
-	// }
-
-	createDomElement(type, classes) {
-		let node = document.createElement('div');
-		for (let str of classes) {
-			node.classList.add(str);
+	function _createDomElement(type, classes) {
+		var node = document.createElement('div');
+		for (var i = 0; i < classes.length; ++i) {
+			node.classList.add(classes[i]);
 		}
 		return node;
 	}
 
-	// createSVGElement(type) {
-	// 	return document.createElementNS(this.XMLNS, type);
-	// }
-
-	// setSVGAttribute(node, attr, value) {
-	// 	node.setAttributeNS(null, attr, value);
-	// }
-
-	// rotateNode(someNode) {
-	// 	rotateX(angle)
-	// }
-
-	// click() {
-
-	// }
+	return {
+		init: init
+	}
 }
