@@ -6,6 +6,7 @@ window.Rippler = function Rippler () {
 	var rad = 16;
 	var diameter = 2 * rad;
 	var toggles = null;
+	var transforms = null;
 	var clickCount = 0;
 	var clickSrc = [null];
 	var subInterval = 45;
@@ -61,9 +62,11 @@ window.Rippler = function Rippler () {
 
 		toggles = new Array(numTall);
 		circles = new Array(numTall);
+		transforms = new Array(numTall);
 		for (var i = 0; i < numTall; ++i) {
 			circles[i] = new Array(numWide);
 			toggles[i] = new Array(numWide);
+			transforms[i] = new Array(numWide);
 			for (var j = 0; j < numWide; ++j) {
 				circle = circles[i][j] = _makeCircle(i, j);
 				frag.appendChild(circle);
@@ -178,9 +181,10 @@ window.Rippler = function Rippler () {
 	}
 
 	function _updateTransform(node, coords, count) {
-		var zRotation = _calcZRotation(coords, count);
-		var yRotation = _bumpYRotation(coords);
-		var transform = 'translate3d(0,0,0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
+		var lastTransform = transforms[coords.y][coords.x];
+		var zRotation = lastTransform.zRotation = _calcZRotation(coords, count);
+		var yRotation = lastTransform.yRotation = _bumpYRotation(coords);
+		var transform = 'translate3d(' + lastTransform.x + ',' + lastTransform.y +',0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
 		node.style.transform = node.style['-webkit-transform'] = transform;
 	}
 
@@ -188,8 +192,15 @@ window.Rippler = function Rippler () {
 		var circle = _createDomElement('div', ['card']);
 		circle.setAttribute('data-x', col);
 		circle.setAttribute('data-y', row);
-		circle.style.left = (diameter * col) + 'px';
-		circle.style.top = (diameter * row) + 'px';
+		var transformJSON = {
+			rotateY: 0,
+			rotateZ: 0
+		};
+		var left = transformJSON.x = (diameter * col) + 'px';
+		var top =  transformJSON.y = (diameter * row) + 'px';
+		transforms[row][col] = transformJSON;
+		var transform = 'translate3d(' + left + ',' + top +',0) rotate(0) rotateY(0)';
+		circle.style.transform = circle.style['-webkit-transform'] = transform;
 		return circle;
 	}
 
