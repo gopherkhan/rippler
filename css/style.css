@@ -1,15 +1,29 @@
-html, body {
+body {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	overflow: hidden;
+}
+
+body {
 	width: 100%;
 	height: 100%;
 	background-color: slategray;
 	color: white;
+	font-family: Optima,Segoe,"Segoe UI",Candara,Calibri,Arial,sans-serif;
 }
+
+/*body {
+	padding: 5px;
+}*/
 
 #viz {
 	display: block;
 	position: relative;
-	width: 99%;
-    height: 94%;
+	width: calc(100% - 15px);
+    height: calc(100% - 60px);
 }
 
 .card {
@@ -19,7 +33,7 @@ html, body {
 	height: 30px;
 	position: absolute;
 	border: 2px solid white;
-	background-color: #1f77b4;/*teal; */
+	background-color: #aec7e8;/*teal; */
 	transition: all;
 	transition-duration: 50ms;
 	transform: translate3d(0,0,0) rotate(0deg) rotateY(0deg);

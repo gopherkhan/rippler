@@ -4,13 +4,13 @@ window.Rippler = function Rippler () {
 	var height = 0;
 	var svg = null;
 	var rad = 16;
+	var diameter = 2 * rad;
 	var toggles = null;
 	var clickCount = 0;
 	var clickSrc = [null];
 	var subInterval = 45;
 	var lastRotation = {};
-	var COLORS  = ['#1f77b4',
-					'#aec7e8',
+	var COLORS  = ['#aec7e8',
 					'#ff7f0e',
 					'#ffbb78',
 					'#2ca02c',
@@ -28,7 +28,8 @@ window.Rippler = function Rippler () {
 					'#bcbd22',
 					'#dbdb8d',
 					'#17becf',
-					'#9edae5'];
+					'#9edae5', 
+					'#1f77b4'];
 
 	function init(target) {
 
@@ -37,19 +38,22 @@ window.Rippler = function Rippler () {
 			if (!target) { return; }
 		}
 		domElem = target;
+		_resizeRender();
+		
+		domElem.addEventListener('click', _handleClick, true);
+		domElem.addEventListener('transitionend', _transitionHandler, true);
+		window.addEventListener('resize', _resizeRender);
+	}
+
+	function _resizeRender() {
 		var boundingRect = domElem.getBoundingClientRect();
 		width = boundingRect.width;
 		height = boundingRect.height;
-
-		
 		_initCircles();
-
-		domElem.addEventListener('click', _handleClick, true);
-		domElem.addEventListener('transitionend', _transitionHandler, true);
 	}
 
 	function _initCircles() {
-		var diameter = 2 * rad;
+		domElem.innerHTML = "";
 		var numWide = Math.floor(width / diameter);
 		var numTall = Math.floor(height / diameter);
 		var frag = document.createDocumentFragment();
@@ -146,7 +150,6 @@ window.Rippler = function Rippler () {
 		var src = clickSrc[count];
 		var deltaY = coords.y - src.y;
 		var deltaX = coords.x - src.x;
-		var diameter = rad * 2;
 		return Math.atan2(deltaY * diameter, deltaX * diameter) * 180 / Math.PI; 
 	}
 
@@ -185,7 +188,6 @@ window.Rippler = function Rippler () {
 		var circle = _createDomElement('div', ['card']);
 		circle.setAttribute('data-x', col);
 		circle.setAttribute('data-y', row);
-		var diameter = rad * 2;
 		circle.style.left = (diameter * col) + 'px';
 		circle.style.top = (diameter * row) + 'px';
 		return circle;
