@@ -127,10 +127,10 @@ window.Rippler = function Rippler () {
 		var coords = _getCoordinates(node);
 		var count = toggles[coords.y][coords.x];
 		var neighbors = _collectNeighbors(coords.x, coords.y);
-		neighbors.forEach(
-			function(neighbor) {
-				_startRipple(neighbor, count);
-			});
+		
+		for (var i = 0; i < neighbors.length; ++i) {
+			_startRipple(neighbors[i], count);
+		}
 	}
 
 	function _makeKey(coords) {
