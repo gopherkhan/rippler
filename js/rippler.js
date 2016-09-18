@@ -167,7 +167,7 @@ window.Rippler = function Rippler () {
 		var coords = _getCoordinates(node);
 		var count = toggles[coords.y][coords.x];
 		var lastRotation = _getLastYRotation(coords)
-		if (lastRotation % 360 == 0) {
+		if (lastRotation % 180 == 0) {
 			return;
 		}
 
