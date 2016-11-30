@@ -50,26 +50,26 @@ window.Rippler = function Rippler () {
 		var boundingRect = domElem.getBoundingClientRect();
 		width = boundingRect.width;
 		height = boundingRect.height;
-		_initCircles();
+		_initCards();
 	}
 
-	function _initCircles() {
+	function _initCards() {
 		domElem.innerHTML = "";
 		var numWide = Math.floor(width / diameter);
 		var numTall = Math.floor(height / diameter);
 		var frag = document.createDocumentFragment();
-		var circle;
+		var card;
 
 		toggles = new Array(numTall);
-		circles = new Array(numTall);
+		cards = new Array(numTall);
 		transforms = new Array(numTall);
 		for (var i = 0; i < numTall; ++i) {
-			circles[i] = new Array(numWide);
+			cards[i] = new Array(numWide);
 			toggles[i] = new Array(numWide);
 			transforms[i] = new Array(numWide);
 			for (var j = 0; j < numWide; ++j) {
-				circle = circles[i][j] = _makeCircle(i, j);
-				frag.appendChild(circle);
+				card = cards[i][j] = _makeCard(i, j);
+				frag.appendChild(card);
 			}
 		}
 
@@ -102,12 +102,12 @@ window.Rippler = function Rippler () {
 		var neighbors = [], nextY, nextX, neighborCount;
 		for (var i = -1; i <= 1; ++i) {
 			nextY = y + i;
-			if (nextY < 0 || nextY >= circles.length) { 
+			if (nextY < 0 || nextY >= cards.length) { 
 				continue; 
 			}
 			for (var j = -1; j <= 1; ++j) {
 				nextX = j + x;
-				if (j == 0 && i == 0|| nextX < 0 || nextX >= circles[nextY].length) {
+				if (j == 0 && i == 0|| nextX < 0 || nextX >= cards[nextY].length) {
 					continue;
 				}
 				neighborCount = toggles[nextY][nextX];
@@ -140,12 +140,12 @@ window.Rippler = function Rippler () {
 	function _bumpYRotation(coords) {
 		var key = _makeKey(coords);
 		lastRotation[key] = lastRotation[key] || 0;
-		lastRotation[key] = lastRotation[key] + subInterval;
+		lastRotation[key] = (lastRotation[key] + subInterval) % 180;
 		return lastRotation[key];
 	}
 
 	function _startRipple(coords, count) {
-		var node = circles[coords.y][coords.x];
+		var node = cards[coords.y][coords.x];
 		_updateTransform(node, coords, count);
 	}
 
@@ -171,7 +171,7 @@ window.Rippler = function Rippler () {
 			return;
 		}
 
-		var colorIdx = Math.floor((lastRotation - 90) / 180) % COLORS.length;
+		var colorIdx = toggles[coords.y][coords.x] % COLORS.length;
 		var color = COLORS[colorIdx];
 		
 		_rippleOut(node);
@@ -184,14 +184,14 @@ window.Rippler = function Rippler () {
 		var lastTransform = transforms[coords.y][coords.x];
 		var zRotation = lastTransform.zRotation = _calcZRotation(coords, count);
 		var yRotation = lastTransform.yRotation = _bumpYRotation(coords);
-		var transform = 'translate3d(' + lastTransform.x + ',' + lastTransform.y +',0) rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
+		var transform = 'translate(' + lastTransform.x + ',' + lastTransform.y +') rotate(' + zRotation + 'deg) rotateY(' + yRotation  + 'deg)';
 		node.style.transform = node.style['-webkit-transform'] = transform;
 	}
 
-	function _makeCircle(row, col) {
-		var circle = _createDomElement('div', ['card']);
-		circle.setAttribute('data-x', col);
-		circle.setAttribute('data-y', row);
+	function _makeCard(row, col) {
+		var card = _createDomElement('div', ['card']);
+		card.setAttribute('data-x', col);
+		card.setAttribute('data-y', row);
 		var transformJSON = {
 			rotateY: 0,
 			rotateZ: 0
@@ -199,9 +199,9 @@ window.Rippler = function Rippler () {
 		var left = transformJSON.x = (diameter * col) + 'px';
 		var top =  transformJSON.y = (diameter * row) + 'px';
 		transforms[row][col] = transformJSON;
-		var transform = 'translate3d(' + left + ',' + top +',0) rotate(0) rotateY(0)';
-		circle.style.transform = circle.style['-webkit-transform'] = transform;
-		return circle;
+		var transform = 'translate(' + left + ',' + top +') rotate(0) rotateY(0)';
+		card.style.transform = card.style['-webkit-transform'] = transform;
+		return card;
 	}
 
 	function _createDomElement(type, classes) {
