@@ -183,9 +183,8 @@ window.Rippler = function Rippler() {
     const lastTransform = transforms[coords.y][coords.x];
     const zRotation = lastTransform.zRotation = _calcZRotation(coords, count);
     const yRotation = lastTransform.yRotation = _bumpYRotation(coords);
-    const transform = 'translate3d(' + lastTransform.x + ',' + lastTransform.y +
-                    ', 0) rotate(' + zRotation + 'deg) rotateY(' +
-                    yRotation + 'deg)';
+    const transform = `translate3d(${lastTransform.x},${lastTransform.y
+      }, 0) rotate(${zRotation}deg) rotateY${yRotation}deg)`;
     node.style.transform = node.style['-webkit-transform'] = transform;
     node.style.transform = node.style['-moz-transform'] = transform;
   }
