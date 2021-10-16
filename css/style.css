@@ -7,10 +7,14 @@ body {
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
-	background-color: steelblue;
+	background-color: #0267C1;
 	color: white;
 	font-family: Verdana,Geneva,sans-serif;
 	text-align: center;
+}
+
+a {
+  color: gold;
 }
 
 h3 {
@@ -23,6 +27,7 @@ h3 {
 	width: calc(100% - 30px);
   height: calc(100% - 70px);
   transform: translate3d(0,0,0);
+  -moz-transform: translate3d(0,0,0);
   -webkit-transform: translate3d(0,0,0);
 }
 
@@ -33,10 +38,11 @@ h3 {
 	height: 30px;
 	position: absolute;
 	border: 2px solid white;
-	background-color: #aec7e8;/*teal; */
+	background-color: #7CB4B8;
 	transition: all;
 	transition-duration: 50ms;
-	transform: translate(0,0) rotate(0deg) rotateY(0deg);
+  transform: translate(0,0) rotate(0deg) rotateY(0deg);
+  -moz-transform: translate(0,0) rotate(0deg) rotateY(0deg);
 	-webkit-transform: translate(0,0) rotate(0deg) rotateY(0deg);
 }
 
