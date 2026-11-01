@@ -1,4 +1,5 @@
 body {
+  margin: 0;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -7,10 +8,12 @@ body {
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
-	background-color: #0267C1;
+  background-color: #3C3C43;
 	color: white;
-	font-family: Verdana,Geneva,sans-serif;
-	text-align: center;
+	font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -18,7 +21,12 @@ a {
 }
 
 h3 {
-	font-weight: 400;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+
+  a {
+    color: gold;
+  }
 }
 
 #viz {
@@ -29,6 +37,8 @@ h3 {
   transform: translate3d(0,0,0);
   -moz-transform: translate3d(0,0,0);
   -webkit-transform: translate3d(0,0,0);
+
+  touch-action: none;
 }
 
 .card {

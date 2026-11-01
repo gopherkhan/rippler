@@ -1,17 +1,29 @@
 <!doctype html>
 <html>
-	<head>
-		<title>Javascript Ripples | Chris Nelson</title>
-		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-		<script type="text/javascript" src='js/rippler.js'></script>
-	</head>
-	<body>
-		<h3>Javascript Ripples, by <a href="http://chrisxnelson.com">Chris Nelson</a>. Click the squares, and see what turns up!</h3>
-		<div id="viz"></div>
-	</body>
-	<script type="text/javascript">
-		var rippler = new Rippler();
-		rippler.init('#viz');
-	</script>
+
+<head>
+  <title>Javascript Ripples | Chris Nelson</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+
+<body>
+  <h3>Javascript Ripples, by <a href="http://chrisxnelson.com">Chris Nelson</a>. Click the squares, and see what turns
+    up!</h3>
+  <canvas id="viz"></canvas>
+  <script type="module">
+    import { initRippler } from './js/rippler-canvas.js';
+
+    const canvas = document.getElementById('viz');
+    initRippler(canvas);
+  </script>
+</body>
+<!-- <script type="text/javascript">
+  const rippler = new Rippler();
+  rippler.init('#viz');
+</script> -->
+
 </html>
